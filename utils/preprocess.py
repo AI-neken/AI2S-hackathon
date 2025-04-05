@@ -13,9 +13,25 @@ def null_ts(df):
     return df_grouped[df_grouped['Quantity'] == 0]['unique_id'].values
 
 def end_zero(df:pd.DataFrame):
-    last_null_shipment = df[(df['Month'] == 'Dec2023') & (df['Quantity'] == 0)]
-    df_grouped = count_quantity(last_null_shipment)
-    return df_grouped[df_grouped['Quantity'] != 0]['unique_id'].values
+    null_list = null_ts(df)
+    return df[(~df['unique_id'].isin(null_list)) & (df['ds'].dt.year == 2023) & (df['Quantity'] == 0)]['unique_id'].values
+
+def filter_ds(df):
+    # Prendi solo righe con Quantity != 0
+    non_null_data = df[df['Quantity'] != 0]
+
+    # Trova min e max ds per ogni unique_id
+    ds_bounds = non_null_data.groupby('unique_id')['ds'].agg(['min', 'max']).reset_index()
+    ds_bounds.columns = ['unique_id', 'min_ds', 'max_ds']
+
+    # Unisci i bounds al DataFrame originale
+    df = df.merge(ds_bounds, on='unique_id', how='left')
+
+    # Filtra il df usando i bounds
+    df_filtered = df[(df['ds'] >= df['min_ds']) & (df['ds'] <= df['max_ds'])]
+
+    # Rimuovi le colonne temporanee
+    return df_filtered.drop(columns=['min_ds', 'max_ds'])
 
 def preprocess_ex1(df):
     df['unique_id'] = df['Country'] + '_' + df['Product']
@@ -27,11 +43,12 @@ def preprocess_ex1(df):
     all_zeros_data = df[df['unique_id'].isin(null_id_list)]
     
     # Data 2: Previously active series
-    prev_active_data = df[(df['unique_id'].isin(prev_id_active)) & (df['Quantity'] != 0)]
+    prev_active_data = df[(df['unique_id'].isin(prev_id_active))]
+    prev_active_data = filter_ds(prev_active_data)
 
     # Data 3: Currently active
-    curr_active_data = df[(~df['unique_id'].isin(np.concatenate([null_id_list, prev_id_active]))) & \
-                          (df['Quantity'] != 0)]
+    curr_active_data = df[(~df['unique_id'].isin(np.concatenate([null_id_list, prev_id_active])))]
+    curr_active_data = filter_ds(curr_active_data)
 
     column_order = ['unique_id', 'ds', 'Quantity', 'Country', 'Product']
 
