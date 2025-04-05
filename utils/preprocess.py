@@ -60,8 +60,8 @@ def preprocess_ex1(df):
     df['unique_id'] = df['Country'] + '_' + df['Product']
     df['ds'] = pd.to_datetime(df['Month'], format='%b%Y')
 
-    validation_df = df[df['ds'].dt.year == 2023]
-    train_df = df[df['ds'].dt.year < 2023]
+    validation_df = df[df['ds'].dt.year == 2023].reset_index(drop=True)
+    train_df = df[df['ds'].dt.year < 2023].reset_index(drop=True)
 
 
     null_id_list = null_ts(train_df)
@@ -79,4 +79,4 @@ def preprocess_ex1(df):
 
     column_order = ['unique_id', 'ds', 'Quantity', 'Country', 'Product']
 
-    return all_zeros_data[column_order], prev_active_data[column_order], curr_active_data[column_order], validation_df
+    return all_zeros_data[column_order], prev_active_data[column_order], curr_active_data[column_order], validation_df[column_order]
