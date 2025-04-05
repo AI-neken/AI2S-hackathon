@@ -159,11 +159,11 @@ else:
     if not check or not checkS:
         s = float("inf")
     cost = computeCost(proposal, shipments, productionCost, shipmentsCost)
-    print(f"Evaluation: {s}, {cost}")
+    print(f"Evaluation: {s}, {cost:.3f}")
     if (len(sys.argv)>8 and sys.argv[8] == "verbose"):
         print(f"Valid capacity: {check}")
         print(f"Valid shipments: {checkS}")
         print(dfv)
         print(dfs)
-        print(dfA)
+        print(dfA[dfA['Error']!=0])
 
