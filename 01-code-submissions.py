@@ -92,16 +92,23 @@ def main() -> None:
     # Add country and product columns
     final_df = add_country_product_columns(final_df)
     
-    # Save results
-    final_df[['Country', 'Product', 'Month', 'Quantity']].to_csv(OUTPUT_PATH, index=False)
+    # Reorder columns to match the required order
+    final_df = final_df[['Country', 'Product', 'Month', 'Quantity']]
     
+    # Save forecast results
+    final_df.to_csv(OUTPUT_PATH, index=False)
     print(f"Forecast successfully saved to {OUTPUT_PATH}")
-
-     # Save validation data
+    
+    # Save validation data
     validation_output_path = OUTPUT_PATH.parent / "01_output_validation.csv"
     df_train_active['Month'] = restore_original_format(df_train_active['ds'])
     df_train_active = add_country_product_columns(df_train_active)
-    df_train_active[['Country', 'Product', 'Month', 'Quantity']].to_csv(validation_output_path, index=False)
+    
+    # Reorder columns for validation data
+    df_train_active = df_train_active[['Country', 'Product', 'Month', 'Quantity']]
+    
+    # Save validation data
+    df_train_active.to_csv(validation_output_path, index=False)
     print(f"Validation data successfully saved to {validation_output_path}")
 
 if __name__ == "__main__":
