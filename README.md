@@ -12,7 +12,7 @@ All the other required dependencies will be installed with pip.
 
 ## How to run the code: 
 
-1. **Get the code**: 
+1. **Get the code**: ./01-code-submissions.py
   - Clone the repository 
 
     ```bash
@@ -45,7 +45,13 @@ All the other required dependencies will be installed with pip.
     or altenatevily:
 
     ```bash
-    ./<file_name>
+    ./<file_name>.py
     ```
 
+# Run the code + Scores
+  To run the code and get the scores, you can use the following command:
+
+    ```bash
+    ./run_all.sh
+    ```
     
