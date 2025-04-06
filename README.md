@@ -3,7 +3,7 @@
 This is the repository for the solution of the AI2S hackaton 2025 proposed by the AI-neken team.
 The original problem text (in italian) is attached in the [assignment](./assignment.pdf) file.
 
-## Prereequisites
+## Prerequisites
  - Python`3.12.9` or lower
  - pip
 
