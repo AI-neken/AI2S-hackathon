@@ -26,20 +26,14 @@ def add_ensemble_predictions(
     forecasts: pd.DataFrame,
     active_ids: List[str]
 ) -> pd.DataFrame:
-    """Add ensemble average and median predictions to the validation set."""
-    df_validation['Average'] = 0
-    df_validation['Median'] = 0
+    """Add ensemble average and median predictions to the validation set by merging on unique_id and ds."""
+    ensemble_cols = ['unique_id', 'ds', 'EnsambleAverage', 'EnsambleMedian']
+    merged = pd.merge(df_validation, forecasts[ensemble_cols], on=['unique_id', 'ds'], how='left')
 
-    for uid in tqdm(active_ids):
-        df_validation.loc[df_validation['unique_id'] == uid, 'Average'] = forecasts.loc[
-            forecasts['unique_id'] == uid, 'EnsambleAverage'
-        ].values.astype(int)
+    merged['Average'] = merged['EnsambleAverage'].fillna(0).astype(int)
+    merged['Median'] = merged['EnsambleMedian'].fillna(0).astype(int)
 
-        df_validation.loc[df_validation['unique_id'] == uid, 'Median'] = forecasts.loc[
-            forecasts['unique_id'] == uid, 'EnsambleMedian'
-        ].values.astype(int)
-
-    return df_validation
+    return merged
 
 def save_forecasts(df_validation: pd.DataFrame) -> None:
     """Save validation and submission forecasts to CSV files."""
@@ -64,7 +58,10 @@ def main() -> None:
     """Main execution function."""
     # Load and preprocess data
     df = pd.read_csv(INPUT_PATH)
-    df_train_null, df_train_inactive, df_train_active, df_validation = preprocess.preprocess_ex1(df)
+    df_train_null, df_train_inactive, df_train_active = preprocess.preprocess_ex1_final_sub(df)
+
+    # For validation, reuse active data (or change this depending on validation split)
+    df_validation = df_train_active.copy()
 
     # Initialize and fit model
     sf = StatsForecast(
